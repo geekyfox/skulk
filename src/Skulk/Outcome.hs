@@ -4,7 +4,7 @@
 
 module Skulk.Outcome where
 
-import Control.Applicative(liftA)
+import Control.Applicative(liftA, Applicative)
 import Control.Monad(liftM,ap)
 
 import Skulk.Bumpy
