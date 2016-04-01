@@ -1,7 +1,6 @@
 module TestOutcome (spec) where
     
 import Test.Hspec
-import Skulk.Bumpy
 import Skulk.Outcome hiding (describe)
 import qualified Skulk.Outcome
 
@@ -50,9 +49,9 @@ spec = do
         impl (Skulk.Outcome.describe id) "foobar" (show y) (show z)
     describe "Outcome.fmap" $ do
         impl (fmap length) (OK 6) y' z'
-    describe "Outcome.bump Just" $ do
-        impl (bump . fmap Just) (Just x) (Just y) (Just z)
-    describe "Outcome.bump Nothing" $ do
-        impl (bump . toNothing) Nothing (Just y) (Just z)
+    describe "Outcome.sequenceA Just" $ do
+        impl (sequenceA . fmap Just) (Just x) (Just y) (Just z)
+    describe "Outcome.sequenceA Nothing" $ do
+        impl (sequenceA . toNothing) Nothing (Just y) (Just z)
 
         

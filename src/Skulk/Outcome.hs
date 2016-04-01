@@ -7,7 +7,7 @@ module Skulk.Outcome where
 import Control.Applicative(liftA, Applicative,pure,(<$>),(<*>))
 import Control.Monad(liftM,ap)
 
-import Skulk.Bumpy
+import Skulk.Deep
 
 -- | Universal result type for calculations that may either: produce
 -- a value, signal the failure to obtain value, or signal that value is
@@ -50,10 +50,15 @@ instance Monad Outcome where
     return = OK
     fail = Fail
 
-instance Bumpy Outcome where
-    bump (OK x) = liftA OK x
-    bump (Fail msg) = pure $ Fail msg
-    bump (Skip msg) = pure $ Skip msg
+instance Foldable Outcome where
+    foldr f x (OK y) = f y x
+    foldr _ x (Fail _) = x
+    foldr _ x (Skip _) = x
+
+instance Traversable Outcome where
+    sequenceA (OK x) = liftA OK x
+    sequenceA (Fail msg) = pure $ Fail msg
+    sequenceA (Skip msg) = pure $ Skip msg
 
 instance (Show a) => Show (Outcome a) where
     show = describe show

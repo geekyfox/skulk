@@ -16,7 +16,7 @@ cabal-version: >=1.10
 
 library
     exposed-modules:
-        Skulk.Bumpy
+        Skulk.Deep
         Skulk.Outcome
     -- other-modules:       
     -- other-extensions:    
