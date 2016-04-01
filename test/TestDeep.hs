@@ -1,11 +1,28 @@
+{-# LANGUAGE CPP #-}
+
 module TestDeep (spec) where
 
 import Test.Hspec
 import Skulk.Deep
 
+#if __GLASGOW_HASKELL__ < 708
+-- Backport from base-4.7.0.0
+
+import Control.Applicative((<$>), pure)
+import Data.Foldable(Foldable, foldMap, foldr)
+import Data.Traversable(Traversable, traverse)
+
+instance Foldable (Either a) where
+    foldr _ z (Left _) = z
+    foldr f z (Right y) = f y z
+
+instance Traversable (Either a) where
+    traverse _ (Left x) = pure (Left x)
+    traverse f (Right y) = Right <$> f y    
+#endif
+
 type M a = Maybe a
 type E a = Either Int a
-type T a = (String, a)
 
 validateEM :: E (M String) -> M (E String) -> Spec
 validateEM x y = do

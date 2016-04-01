@@ -1,6 +1,10 @@
+{-# LANGUAGE CPP #-}
+
 module TestOutcome (spec) where
-    
+
+#if __GLASGOW_HASKELL__ < 710
 import Data.Traversable(sequenceA)
+#endif
 
 import Test.Hspec
 import Skulk.Outcome hiding (describe)
