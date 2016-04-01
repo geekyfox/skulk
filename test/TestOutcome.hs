@@ -1,5 +1,7 @@
 module TestOutcome (spec) where
     
+import Data.Traversable(sequenceA)
+
 import Test.Hspec
 import Skulk.Outcome hiding (describe)
 import qualified Skulk.Outcome

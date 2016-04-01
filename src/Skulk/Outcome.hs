@@ -6,6 +6,8 @@ module Skulk.Outcome where
 
 import Control.Applicative(liftA, Applicative,pure,(<$>),(<*>))
 import Control.Monad(liftM,ap)
+import Data.Foldable(Foldable,foldr)
+import Data.Traversable(Traversable, sequenceA)
 
 import Skulk.Deep
 

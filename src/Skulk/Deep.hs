@@ -4,6 +4,7 @@ module Skulk.Deep where
 
 import Control.Applicative((<$>),Applicative,liftA,pure,(<*>))
 import Control.Monad(liftM,join)
+import Data.Traversable(Traversable, sequenceA)
 
 -- | Reduces @A (B (A x))@ to @A (B x)@.
 reduceABA :: (Applicative a, Monad a, Traversable b) => a (b (a x)) -> a (b x)
@@ -35,7 +36,7 @@ x >>>= f = reduceABAB (f <$$> x)
 -- | Variety of "deep bind" for chaining operations on nested data
 -- structures.
 infixl 1 >>==
-(>>==) :: (Functor a, Monad b) => a (b x) -> (x -> b y) -> a (b y)
+(>>==) :: (Functor a, Functor b, Monad b) => a (b x) -> (x -> b y) -> a (b y)
 x >>== f = join <$> (f <$$> x)
 
 -- | Variety of "deep bind" for chaining operations on nested data
