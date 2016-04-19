@@ -1,6 +1,6 @@
 
 name: skulk
-version: 0.1.0.0
+version: 0.1.1.0
 synopsis: Eclectic collection of utility functions
 description: Eclectic collection of utility functions
 homepage: http://github.com/geekyfox/skulk
@@ -21,6 +21,7 @@ library
     exposed-modules:
         Skulk.Deep
         Skulk.Outcome
+        Skulk.ToString
     build-depends:
         base >=4.5 && <4.9
     hs-source-dirs: src
@@ -32,8 +33,13 @@ test-suite tests
     type: exitcode-stdio-1.0
     hs-source-dirs: test
     main-is: TestMain.hs
+    other-modules:
+        TestDeep
+        TestOutcome
+        TestToString
     build-depends:
         skulk
         ,base>=4.5 && <4.9
         ,hspec
+        ,QuickCheck
 

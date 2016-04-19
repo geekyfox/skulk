@@ -7,6 +7,7 @@ import Data.Traversable(sequenceA)
 #endif
 
 import Test.Hspec
+import Test.QuickCheck
 import Skulk.Outcome hiding (describe)
 import qualified Skulk.Outcome
 
@@ -59,5 +60,15 @@ spec = do
         impl (sequenceA . fmap Just) (Just x) (Just y) (Just z)
     describe "Outcome.sequenceA Nothing" $ do
         impl (sequenceA . toNothing) Nothing (Just y) (Just z)
+    describe "Outcome.allOK" $ do
+        it "[OK, OK]" $ property $ \(a, b) ->
+            allOK [OK (a :: Int), OK b] `shouldBe` OK [a, b]
+        it "[OK, Skip, OK]" $ property $ \(a, b, c) ->
+            allOK [OK (a :: Int), Skip b, OK c] `shouldBe` OK [a, c]
+        it "[OK, Fail]" $ property $ \(a, b) ->
+            allOK [OK (a :: Int), Fail b] `shouldBe` Fail b
+        it "[Fail, OK, Fail]" $ property $ \(a, b, c) ->
+            allOK [Fail a, OK (b :: Int), Fail c] `shouldBe` Fail a
+        
 
         

@@ -1,5 +1,5 @@
--- | Collection of convenience functions for dealing with nested monadic
--- structures.
+-- | Collection of convenience functions for dealing with nested
+-- applicative/monadic/etc  structures.
 module Skulk.Deep where
 
 import Control.Applicative((<$>),Applicative,liftA,pure,(<*>))
