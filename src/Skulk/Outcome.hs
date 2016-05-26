@@ -78,6 +78,16 @@ toEither (OK x) = Right x
 toEither (Fail msg) = Left $ "FAIL: " ++ msg
 toEither (Skip msg) = Left $ "SKIP: " ++ msg
 
+-- | Converts `Either ErrorMessage Value` to `Outcome Value`
+fromEither :: Either String a -> Outcome a
+fromEither (Left msg) = Fail msg
+fromEither (Right v) = OK v
+
+-- | Converts `Maybe Value` to `Outcome Value` using provided error
+-- message to designate `Fail`.
+fromMaybe :: String -> Maybe a -> Outcome a
+fromMaybe msg = maybe (Fail msg) OK
+
 -- | Collapses a list of `Outcome`s into a single `Outcome`. Result may
 -- either be `Fail` (if original list contains any) or list of all
 -- `OK`s; all `Skip`s are discarded.

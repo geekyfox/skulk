@@ -5,6 +5,7 @@ module TestOutcome (spec) where
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable(sequenceA)
 #endif
+import Data.Foldable(toList)
 
 import Test.Hspec
 import Test.QuickCheck
@@ -69,6 +70,21 @@ spec = do
             allOK [OK (a :: Int), Fail b] `shouldBe` Fail b
         it "[Fail, OK, Fail]" $ property $ \(a, b, c) ->
             allOK [Fail a, OK (b :: Int), Fail c] `shouldBe` Fail a
-        
+    describe "Outcome.fromMaybe" $ do
+        it "Nothing" $ property $ \a ->
+            fromMaybe a Nothing `shouldBe` (Fail a :: Outcome Int)
+        it "Just x" $ property $ \(a, b) ->
+            fromMaybe a (Just b) `shouldBe` (OK b :: Outcome Int)
+    describe "Outcome.Foldable" $ do
+        it "Skip x" $ property $ \a ->
+            toList (Skip a) `shouldBe` ([] :: [Int])
+        it "Fail x" $ property $ \a ->
+            toList (Fail a) `shouldBe` ([] :: [Int])
+        it "OK x" $ property $ \a ->
+            toList (OK a) `shouldBe` ([a] :: [Int])
+    describe "Outcome.fromEither" $ do
+        it "Left msg" $ property $ \a ->
+            fromEither (Left a :: Either String Int) `shouldBe` (Fail a :: Outcome Int)
+        it "Right x" $ property $ \a ->
+            fromEither (Right a :: Either String Int) `shouldBe` (OK a :: Outcome Int)
 
-        
