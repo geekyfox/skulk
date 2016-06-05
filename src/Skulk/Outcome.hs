@@ -103,3 +103,9 @@ allOK = impl []
 --   and terminates the execution with `error`.
 exposeOrDie :: Outcome a -> a
 exposeOrDie = either error id . toEither
+
+type OutcomeM a b = Deep a Outcome b
+type OutcomeIO a = OutcomeM IO a
+
+describeAndPrint :: (a -> String) -> OutcomeIO a -> IO ()
+describeAndPrint f x = expose x >>= putStrLn . describe f

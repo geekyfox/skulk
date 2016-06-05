@@ -6,6 +6,38 @@ import Control.Applicative((<$>),Applicative,liftA,pure,(<*>))
 import Control.Monad(liftM,join)
 import Data.Traversable(Traversable, sequenceA)
 
+newtype Deep a b c = Deep { expose :: a (b c) } deriving (Show, Eq)
+
+wrap :: (Monad a) => b c -> Deep a b c
+wrap = Deep . return
+
+inject :: (Functor a, Monad b) => a c -> Deep a b c
+inject = Deep . fmap return
+
+eject :: (Functor a) => (b c -> c) -> Deep a b c -> a c
+eject f = fmap f . expose
+
+instance (Functor a, Functor b) => Functor (Deep a b) where
+    f `fmap` (Deep x) = Deep (f <$$> x)
+
+instance (Monad a, Applicative b) => Applicative (Deep a b) where
+    pure = Deep . pure . pure
+    (Deep abf) <*> (Deep abx) = Deep $ do
+        bf <- abf
+        bx <- abx
+        let by = bf <*> bx
+        return by
+
+instance (Monad a, Monad b, Traversable b) => Monad (Deep a b) where
+    return = Deep . return . return
+    fail = Deep . return . fail
+    (Deep abx) >>= f = Deep $ do
+        bx <- abx
+        let baby = expose . f <$> bx
+        let abby = sequence baby
+        let aby = join <$> abby
+        aby
+
 -- | Reduces @A (B (A x))@ to @A (B x)@.
 reduceABA :: (Applicative a, Monad a, Traversable b) => a (b (a x)) -> a (b x)
 reduceABA x = join (sequenceA <$> x)

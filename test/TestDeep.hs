@@ -3,6 +3,7 @@
 module TestDeep (spec) where
 
 import Test.Hspec
+import Test.QuickCheck
 import Skulk.Deep
 
 #if __GLASGOW_HASKELL__ < 708
@@ -84,3 +85,23 @@ spec = do
                 }
             let y = ([Nothing, Just "foo", Just "bar", Just "baz"] >=>= f)
             y `shouldBe` [Nothing, Just "bar", Just "baz", Just "bazxxx"]
+    describe "Deep" $ do
+        it "wrap" $ property $ \x -> do
+            let y = [x] :: [Int]
+            wrap y `shouldBe` (Deep [y])
+            wrap y `shouldBe` (Deep (Just y))
+        it "inject+expose+eject" $ property $ \x -> do
+            let y = [x] :: [Int]
+            inject y `shouldBe` (Deep [y])
+            (expose $ inject y) `shouldBe` [y]
+            (eject head $ inject y) `shouldBe` y
+            inject y `shouldBe` (Deep [Just x])
+            (expose $ inject y) `shouldBe` [Just x]
+        it "return" $ property $ \x -> do
+            let y = [[x]] :: [[Int]]
+            return x `shouldBe` (Deep y)
+            pure x `shouldBe` (Deep y)
+        it "<*> + <$>" $ property $ \x -> do
+            let f = (\k -> k * 2) :: Int -> Int
+            f <$> (pure x) `shouldBe` (Deep (Just [x * 2]))
+            ((pure f) <*> (pure x)) `shouldBe` (Deep (Just [x * 2]))
