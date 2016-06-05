@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 -- | Collection of convenience functions for dealing with nested
 -- applicative/monadic/etc  structures.
 module Skulk.Deep where
@@ -20,7 +22,11 @@ eject f = fmap f . expose
 instance (Functor a, Functor b) => Functor (Deep a b) where
     f `fmap` (Deep x) = Deep (f <$$> x)
 
+#if __GLASGOW_HASKELL__ < 710
+instance (Applicative a, Monad a, Applicative b) => Applicative (Deep a b) where
+#else
 instance (Monad a, Applicative b) => Applicative (Deep a b) where
+#endif
     pure = Deep . pure . pure
     (Deep abf) <*> (Deep abx) = Deep $ do
         bf <- abf
@@ -28,13 +34,17 @@ instance (Monad a, Applicative b) => Applicative (Deep a b) where
         let by = bf <*> bx
         return by
 
+#if __GLASGOW_HASKELL__ < 710
+instance (Applicative a, Monad a, Monad b, Traversable b) => Monad (Deep a b) where
+#else
 instance (Monad a, Monad b, Traversable b) => Monad (Deep a b) where
+#endif
     return = Deep . return . return
     fail = Deep . return . fail
     (Deep abx) >>= f = Deep $ do
         bx <- abx
         let baby = expose . f <$> bx
-        let abby = sequence baby
+        let abby = sequenceA baby
         let aby = join <$> abby
         aby
 

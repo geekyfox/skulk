@@ -2,6 +2,10 @@
 
 module TestDeep (spec) where
 
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative
+#endif
+
 import Test.Hspec
 import Test.QuickCheck
 import Skulk.Deep
